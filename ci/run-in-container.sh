@@ -38,6 +38,19 @@ elif [ -z "${UNITY_LICENSE:-}" ]; then
   log "INFO | Unity activation (email + password sign-in) | exit $rc; licence files: ${LIC_FILES:-none}"
   grep -iE "licen|entitle|activation|sign.?in|login|token" "$OUT/activation.log" \
     | grep -viE "password" | head -25 | sed 's/^/  log: /' | tee -a "$REPORT"
+elif printf '%s' "$UNITY_LICENSE" | grep -qiE 'Entitlement|<Licenses'; then
+  # Newer Unity Hub stores Personal licences as UnityEntitlementLicense.xml.
+  ENT_DIR=/root/.config/unity3d/Unity/licenses
+  mkdir -p "$ENT_DIR"
+  printf '%s' "$UNITY_LICENSE" | tr -d '\r' > "$ENT_DIR/UnityEntitlementLicense.xml"
+  log "INFO | Unity licence | entitlement XML installed to $ENT_DIR"
+  # Sign in too, so the Licensing Client can refresh the entitlement.
+  unity-editor -batchmode -nographics -quit -logFile /dev/stdout \
+    -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" > "$OUT/activation.log" 2>&1
+  rc=$?
+  log "INFO | Unity sign-in with entitlement XML | exit $rc"
+  grep -iE "licen|entitle|activation|token" "$OUT/activation.log" \
+    | grep -viE "password" | head -25 | sed 's/^/  log: /' | tee -a "$REPORT"
 else
   printf '%s' "$UNITY_LICENSE" | tr -d '\r' > "$LIC_DIR/Unity_lic.ulf"
   unity-editor -batchmode -nographics -quit -logFile /dev/stdout \
