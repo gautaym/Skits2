@@ -72,6 +72,12 @@ jobs:
             -v "$PWD":/project -w /project \
             "$UNITY_IMAGE" bash ci/run-in-container.sh
 
+      - name: Make test video (ffmpeg + text-to-speech)
+        if: always() && steps.secrets.outputs.ok == 'true'
+        run: |
+          sudo chown -R "$USER" Output
+          SKIT_OUT=Output bash ci/make-video.sh
+
       - name: Write report to summary
         if: always()
         run: |
