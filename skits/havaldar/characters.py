@@ -165,16 +165,16 @@ def build_pandey(col):
     ch.parent = chest
     pel = sphere(p + "pelvis_m", loc=(0, 0.02, -0.04), radius=1.0, scale=(0.34, 0.32, 0.22), m=trousers, col=col)
     pel.parent = hips
-    belt_j = joint(p + "belt", hips, (0, -0.06, -0.12), col)
-    belt_j.rotation_euler = (D(-14), 0, 0)  # front dips under the belly
-    belt = torus(p + "belt_m", R=1.0, r=0.06, m=dark, col=col, scale=(0.36, 0.42, 0.7))
+    belt_j = joint(p + "belt", hips, (0, -0.1, 0.0), col)
+    belt_j.rotation_euler = (D(-8), 0, 0)  # front dips slightly under the belly
+    belt = torus(p + "belt_m", R=1.0, r=0.06, m=dark, col=col, scale=(0.385, 0.42, 0.7))
     belt.parent = belt_j
-    buckle = box(p + "buckle", loc=(0, -0.445, 0.0), size=(0.13, 0.04, 0.1), m=brass, col=col, bevel=0.012)
+    buckle = box(p + "buckle", loc=(0, -0.47, 0.0), size=(0.13, 0.04, 0.1), m=brass, col=col, bevel=0.012)
     buckle.parent = belt_j
-    holster = box(p + "holster", loc=(0.38, 0.12, -0.12), size=(0.07, 0.14, 0.2), m=dark, col=col, bevel=0.025,
+    holster = box(p + "holster", loc=(0.4, 0.16, -0.12), size=(0.07, 0.14, 0.2), m=dark, col=col, bevel=0.025,
                   rot=(D(14), 0, 0))
     holster.parent = belt_j
-    flap = box(p + "holster_flap", loc=(0.385, 0.11, -0.02), size=(0.08, 0.15, 0.05), m=dark, col=col, bevel=0.02,
+    flap = box(p + "holster_flap", loc=(0.405, 0.15, -0.02), size=(0.08, 0.15, 0.05), m=dark, col=col, bevel=0.02,
                rot=(D(14), 0, 0))
     flap.parent = belt_j
     # straining shirt buttons down the belly
