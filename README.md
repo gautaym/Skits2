@@ -1,39 +1,31 @@
 # Skits2
 
-A Unity 6 project for making short animated video skits, rendered on GitHub Actions.
+Short animated video skits made with [Blender](https://www.blender.org) (free, no licence needed),
+rendered headless on GitHub Actions.
 
 ## Environment check
 
-`.github/workflows/unity-env-check.yml` starts an Ubuntu machine on GitHub, runs Unity
-6000.0.85f1 (via the [GameCI](https://game.ci) Docker image) and checks the things a skit needs:
+`.github/workflows/blender-env-check.yml` runs on every push to `main` (or manually from
+**Actions → Blender skit environment check → Run workflow**). It installs Blender 4.5 LTS on an
+Ubuntu runner and checks everything a skit needs:
 
 | Check | Why |
 |---|---|
-| Unity licence activation | Unity won't run without it |
-| GPU / OpenGL under a virtual display | Rendering video frames headless |
-| Timeline, Cinemachine, Recorder, TextMeshPro | Animating scenes, camera shots, captions |
-| Render a 3s, 720x1280 two-character test scene to PNG | Proves frames actually render (not blank) |
+| Blender runs headless | Render without a screen |
+| OpenGL on a virtual display | EEVEE / Workbench (fast engines) |
+| Build a scene from Python: meshes, materials, 3D text, keyframes | Script whole skits |
+| Render stills with EEVEE, Cycles (CPU) and Workbench | See which engines work and how fast |
 | espeak-ng text-to-speech | Placeholder voice lines |
-| ffmpeg: frames + voice → `skit_test.mp4` | Final video output |
+| Render a 3s 720x1280 two-character clip with voice to MP4 | Final Shorts-format output |
+| FBX / glTF importers | Bring in ready-made characters (e.g. Mixamo) |
 
-Results show in the run's **Summary** tab; the MP4, report and logs are in the `skit-env-check` artifact.
+Results show in the run's **Summary** tab; the MP4, stills and report are in the
+`skit-env-check` artifact.
 
-### One-time setup: Unity secrets
+### Run locally
 
-Add these under **Settings → Secrets and variables → Actions → New repository secret**:
-
-| Secret | Value |
-|---|---|
-| `UNITY_EMAIL` | Your Unity account email |
-| `UNITY_PASSWORD` | Your Unity account password |
-| `UNITY_LICENSE` | Full contents of your `Unity_lic.ulf` file (Personal licence) |
-| `UNITY_SERIAL` | *Only for Plus/Pro* — use instead of `UNITY_LICENSE` |
-
-To get `Unity_lic.ulf`: install Unity Hub on your computer, sign in and activate a free Personal
-licence, then open the file:
-
-- Windows: `C:\ProgramData\Unity\Unity_lic.ulf`
-- macOS: `/Library/Application Support/Unity/Unity_lic.ulf`
-- Linux: `~/.local/share/unity3d/Unity/Unity_lic.ulf`
-
-Then run the workflow from **Actions → Unity skit environment check → Run workflow**.
+```bash
+blender -b --factory-startup --python ci/blender_check.py -- --out Output --engines Cycles
+# or, with the bpy package (Python 3.11):  pip install bpy==4.5.16
+python ci/blender_check.py --out Output --engines Cycles
+```
