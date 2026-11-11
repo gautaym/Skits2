@@ -78,6 +78,9 @@ jobs:
           if [ -f Output/report.txt ]; then
             { echo '### Skit environment report'; echo '```'; cat Output/report.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
             cat Output/report.txt
+            # Also post as an annotation so it is readable via the public API.
+            body=$(head -c 60000 Output/report.txt | sed -e 's/%/%25/g' | awk 'BEGIN{ORS="%0A"} {print}')
+            echo "::notice title=Skit environment report::${body}"
           fi
 
       - name: Upload report, logs and test video
