@@ -18,11 +18,16 @@ check() { # check <name> <pass:0|1> <detail>
 }
 
 log "== Container tools =="
-apt-get update -qq >/dev/null 2>&1
-DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
-  ffmpeg espeak-ng mesa-utils libgl1-mesa-dri xvfb >/dev/null 2>&1
-rc=$?
-check "apt install ffmpeg espeak-ng mesa xvfb" "$([ $rc = 0 ] && echo 1 || echo 0)" "exit $rc"
+apt-get update > "$OUT/apt.log" 2>&1
+log "INFO | apt-get update | exit $? ($(grep -cE '^(W|E):' "$OUT/apt.log") warnings/errors)"
+grep -E '^(W|E):' "$OUT/apt.log" | head -5 | sed 's/^/  apt: /' | tee -a "$REPORT"
+for pkg in ffmpeg espeak-ng mesa-utils libgl1-mesa-dri xvfb; do
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$pkg" >> "$OUT/apt.log" 2>&1
+  rc=$?
+  check "apt install $pkg" "$([ $rc = 0 ] && echo 1 || echo 0)" \
+    "exit $rc $( [ $rc = 0 ] || tail -2 "$OUT/apt.log" | tr '\n' ' ')"
+done
+log "INFO | OS image | $(. /etc/os-release; echo "$PRETTY_NAME")"
 
 GL=$(xvfb-run -a glxinfo -B 2>&1 | grep -E "OpenGL (renderer|version) string" | tr '\n' ' ')
 check "OpenGL under virtual display (xvfb)" "$([ -n "$GL" ] && echo 1 || echo 0)" "${GL:-no GL context}"
