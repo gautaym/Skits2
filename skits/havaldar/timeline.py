@@ -48,3 +48,6 @@ def f(t):
 
 def vo_path(name):
     return os.path.join(AUDIO, "vo", name)
+
+# Rifle placement relative to Pandey (his local space: +Y is behind him).
+RIFLE_LOCAL = {"loc": (0.06, 1.02, 0.0), "rot_x_deg": 44, "scale": 0.82}

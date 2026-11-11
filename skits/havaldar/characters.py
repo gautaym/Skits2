@@ -264,7 +264,8 @@ def build_pandey(col):
 
 def build_rifle(col):
     """Old bolt-action .303-style rifle; origin at the butt (rests on the ground). ~1.3 m long."""
-    wood = noise_mat("rifle_wood", (0.42, 0.17, 0.05), (0.55, 0.24, 0.08), scale=30, rough=0.4, bump=0.05)
+    wood = noise_mat("rifle_wood", (0.2, 0.07, 0.025), (0.36, 0.15, 0.05), scale=18, rough=0.3, bump=0.08,
+                     mix_c3=(0.18, 0.06, 0.02), scale2=6)
     steel = mat("gunmetal", (0.02, 0.022, 0.025), rough=0.3, metal=0.9, coat=0.3)
     root = joint("rifle_root", None, (0, 0, 0), col)
     parts = [
@@ -285,6 +286,12 @@ def build_rifle(col):
     ]
     for z in (0.62, 0.95, 1.12):
         parts.append(cylinder(f"rifle_band{z}", loc=(0, 0, z), r=0.045, depth=0.03, m=steel, col=col))
+    parts += [
+        box("rifle_rear_sight", loc=(0, -0.045, 0.74), size=(0.03, 0.03, 0.06), m=steel, col=col, bevel=0.005),
+        box("rifle_front_sight", loc=(0, -0.03, 1.3), size=(0.012, 0.035, 0.04), m=steel, col=col, bevel=0.003),
+        cylinder("rifle_nosecap", loc=(0, 0, 1.15), r=0.04, r2=0.03, depth=0.07, m=steel, col=col),
+        cylinder("rifle_bayonet_lug", loc=(0, 0.03, 1.2), r=0.012, depth=0.05, m=steel, col=col),
+    ]
     for o in parts:
         o.parent = root
     return {"root": root}
