@@ -33,7 +33,9 @@ jobs:
           missing=""
           [ -n "$UNITY_EMAIL" ]    || missing="$missing UNITY_EMAIL"
           [ -n "$UNITY_PASSWORD" ] || missing="$missing UNITY_PASSWORD"
-          if [ -z "$UNITY_LICENSE" ] && [ -z "$UNITY_SERIAL" ]; then missing="$missing UNITY_LICENSE"; fi
+          if [ -z "$UNITY_LICENSE" ] && [ -z "$UNITY_SERIAL" ]; then
+            echo "::notice::No UNITY_LICENSE/UNITY_SERIAL - will try signing in with email + password"
+          fi
           if [ -n "$missing" ]; then
             echo "ok=false" >> "$GITHUB_OUTPUT"
             echo "::error::Missing repository secrets:$missing (Settings > Secrets and variables > Actions)"

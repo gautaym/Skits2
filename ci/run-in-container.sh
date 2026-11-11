@@ -38,6 +38,17 @@ if [ -n "${UNITY_SERIAL:-}" ]; then
     -serial "$UNITY_SERIAL" -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" > "$OUT/activation.log" 2>&1
   rc=$?; SERIAL_USED=1
   check "Unity activation (serial)" "$([ $rc = 0 ] && echo 1 || echo 0)" "exit $rc"
+elif [ -z "${UNITY_LICENSE:-}" ]; then
+  # No licence file: sign in with the Unity account and let the Licensing
+  # Client grant the Personal entitlement on this machine.
+  unity-editor -batchmode -nographics -quit -logFile /dev/stdout \
+    -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" > "$OUT/activation.log" 2>&1
+  rc=$?; SERIAL_USED=1
+  LIC_FILES=$(find /root/.local/share/unity3d /root/.config/unity3d /usr/share/unity3d \
+    \( -name '*.ulf' -o -name '*Entitlement*' -o -name '*.xml' \) 2>/dev/null | grep -i licen | tr '\n' ' ')
+  log "INFO | Unity activation (email + password sign-in) | exit $rc; licence files: ${LIC_FILES:-none}"
+  grep -iE "licen|entitle|activation|sign.?in|login|token" "$OUT/activation.log" \
+    | grep -viE "password" | head -25 | sed 's/^/  log: /' | tee -a "$REPORT"
 else
   printf '%s' "$UNITY_LICENSE" | tr -d '\r' > "$LIC_DIR/Unity_lic.ulf"
   unity-editor -batchmode -nographics -quit -logFile /dev/stdout \
@@ -88,5 +99,12 @@ fi
 
 log ""
 if [ $FAILED = 0 ]; then log "OVERALL: READY - everything needed to make a skit works"; else log "OVERALL: NOT READY - see FAIL lines above"; fi
+# Artifacts of a public repo are downloadable by anyone: scrub credentials.
+for f in "$OUT"/*.log "$OUT"/*.txt; do
+  [ -f "$f" ] || continue
+  for s in "${UNITY_EMAIL:-}" "${UNITY_PASSWORD:-}" "${UNITY_SERIAL:-}"; do
+    [ -n "$s" ] && S="$s" perl -pi -e 's/\Q$ENV{S}\E/***/g' "$f"
+  done
+done
 chmod -R a+rwX "$OUT" 2>/dev/null
 exit $FAILED
