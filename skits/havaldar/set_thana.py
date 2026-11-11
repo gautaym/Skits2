@@ -1,8 +1,8 @@
 """The village thana (police outpost) set.
 
 Layout (metres): compound wall runs along X at y=WALL_Y, gate gap between
-x=GATE_X0..GATE_X1. A short return wall at x=CORNER_X comes toward camera
-(Chhotu peeks round its front edge). Cameras look roughly toward +Y.
+x=GATE_X0..GATE_X1. The wall ends at x=CORNER_X; Chhotu hides behind it
+(y > WALL_Y) and peeks round that end. Cameras look roughly toward +Y.
 """
 import math
 import random
@@ -18,7 +18,6 @@ WALL_Y = 2.2
 WALL_H = 2.4
 GATE_X0, GATE_X1 = 1.0, 2.7
 CORNER_X = -3.0
-CORNER_FRONT_Y = 0.2
 TREE_POS = (3.6, 0.6)
 
 
@@ -69,18 +68,17 @@ def build_wall(col):
     t = 0.3
     parts = []
     # main wall, left of gate and right of gate
-    for x0, x1 in ((CORNER_X - 0.15, GATE_X0), (GATE_X1, 6.5)):
+    for x0, x1 in ((CORNER_X, GATE_X0), (GATE_X1, 6.5)):
         w = x1 - x0
         parts.append(box(f"wall_{x0:.1f}", loc=((x0 + x1) / 2, WALL_Y, WALL_H / 2), size=(w, t, WALL_H),
                          m=green, col=col, bevel=0.03))
         parts.append(box(f"wallcap_{x0:.1f}", loc=((x0 + x1) / 2, WALL_Y, WALL_H + 0.04), size=(w + 0.04, t + 0.08, 0.08),
                          m=cap_m, col=col, bevel=0.02))
-    # return wall toward camera (Chhotu's peeking corner)
-    ly = WALL_Y - CORNER_FRONT_Y
-    box("wall_return", loc=(CORNER_X, (WALL_Y + CORNER_FRONT_Y) / 2, WALL_H / 2), size=(t, ly, WALL_H),
-        m=green, col=col, bevel=0.03)
-    box("wall_return_cap", loc=(CORNER_X, (WALL_Y + CORNER_FRONT_Y) / 2, WALL_H + 0.04), size=(t + 0.08, ly + 0.04, 0.08),
-        m=cap_m, col=col, bevel=0.02)
+    # free wall end (Chhotu hides behind the wall and peeks round this corner)
+    box("wall_end_pier", loc=(CORNER_X - 0.1, WALL_Y, WALL_H / 2 + 0.05), size=(0.4, 0.4, WALL_H + 0.1), m=green,
+        col=col, bevel=0.03)
+    box("wall_end_cap", loc=(CORNER_X - 0.1, WALL_Y, WALL_H + 0.15), size=(0.48, 0.48, 0.08), m=cap_m, col=col,
+        bevel=0.02)
     # gate pillars with pyramid caps
     for x in (GATE_X0 - 0.2, GATE_X1 + 0.2):
         box(f"pillar_{x:.1f}", loc=(x, WALL_Y, 1.4), size=(0.45, 0.45, 2.8), m=green, col=col, bevel=0.03)
@@ -89,7 +87,8 @@ def build_wall(col):
                  rot=(0, 0, D(45)), smooth=False)
     # dirty skirting band near ground
     dirt = noise_mat("wall_dirt", (0.25, 0.25, 0.16), (0.33, 0.36, 0.24), scale=6, rough=1.0, bump=0.2)
-    box("wall_skirt", loc=((CORNER_X + 6.5) / 2, WALL_Y - 0.155, 0.18), size=(9.6, 0.02, 0.36), m=dirt, col=col)
+    box("wall_skirt", loc=((CORNER_X + 6.5) / 2, WALL_Y - 0.155, 0.18), size=(6.5 - CORNER_X, 0.02, 0.36), m=dirt,
+        col=col)
     # peeling plaster patch: irregular blob showing brick + raw plaster
     build_peel(col, Vector((-1.7, WALL_Y - t / 2 - 0.004, 1.35)), 0.55, seed=3)
     build_peel(col, Vector((4.6, WALL_Y - t / 2 - 0.004, 0.75)), 0.3, seed=8)

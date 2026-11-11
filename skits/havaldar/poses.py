@@ -48,8 +48,8 @@ CHHOTU = {
                  "hip_L": (15, 0, 0), "knee_L": (10, 0, 0), "ankle_L": (35, 0, 0),
                  "shoulder_R": (-75, 0, 10), "elbow_R": (-20, 0, 0), "shoulder_L": (-20, 0, 55), "elbow_L": (-40, 0, 0)},
     # holding the balloon out behind the havaldar
-    "aim": {"chest": (15, 0, 0), "head": (-5, 0, 0), "shoulder_R": (-80, 0, 0), "elbow_R": (-10, 0, 0),
-            "shoulder_L": (-80, 0, -10), "elbow_L": (-60, 0, 0), "hip_L": (-20, 0, 0), "knee_L": (30, 0, 0),
+    "aim": {"chest": (20, 0, 0), "head": (-12, 0, 0), "shoulder_R": (-55, 0, 0), "elbow_R": (-10, 0, 0),
+            "shoulder_L": (-55, 0, -10), "elbow_L": (-50, 0, 0), "hip_L": (-20, 0, 0), "knee_L": (30, 0, 0),
             "hip_R": (10, 0, 0)},
     "run_a": {"chest": (18, 0, 0), "hip_L": (-60, 0, 0), "knee_L": (70, 0, 0), "hip_R": (35, 0, 0), "knee_R": (60, 0, 0),
               "shoulder_L": (45, 0, 10), "elbow_L": (-70, 0, 0), "shoulder_R": (-50, 0, -10), "elbow_R": (-70, 0, 0)},
@@ -72,7 +72,7 @@ JOINT_KEYS = ["root", "hips", "chest", "neck", "head", "belly",
               "hip_L", "knee_L", "ankle_L", "hip_R", "knee_R", "ankle_R"]
 
 
-def pose(rig, frame, name_or_dict, base=None, keep_root=True):
+def pose(rig, frame, name_or_dict, base=None, keep_root=False):
     """Key every joint of rig at frame: base pose overlaid with the named pose.
 
     Joints not mentioned go to zero, so poses are absolute and repeatable.
