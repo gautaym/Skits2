@@ -28,6 +28,7 @@ import characters as C  # noqa: E402
 import poses as P  # noqa: E402
 import set_thana as S  # noqa: E402
 import timeline as TL  # noqa: E402
+from common import _fcurves as TL_fcurves  # noqa: E402
 from common import collection, joint, key, mat, set_interp, sphere  # noqa: E402
 
 T, f, FPS = TL.T, TL.f, TL.FPS
@@ -366,13 +367,31 @@ def animate_pandey(pd, pd_place, rifle, fb, fl, fx):
     key(pd["belly"], fl + 4, scale=(0.96, 0.96, 1.06))
     key(pd["belly"], fl + 8, scale=(1.0, 1.0, 1.0))
     P.face(pd, fb + 1, lids=-75, lidlo=60, brows=(0.045, -15), look=(0, 0))
-    # beret flies off spinning, lands on the ground
+    # beret: rides the head (Child Of) until the bang, then flies free in world space and lands
     beret = pd["beret"]
-    key(beret, fb, loc=beret.location.copy(), rot=(0, 0, 0))
-    b0 = beret.location.copy()
-    key(beret, fb + 8, loc=b0 + Vector((0.1, -0.2, 0.7)), rot=(180, 0, 540))
-    key(beret, fb + 16, loc=b0 + Vector((0.25, -0.5, 0.9)), rot=(300, 40, 900))
-    key(beret, fl + 6, loc=b0 + Vector((0.35, -0.7, -0.45)), rot=(350, 60, 1080))
+    evaluate(1)
+    local = beret.matrix_local.copy()
+    beret.parent = None
+    beret.matrix_world = local  # values now interpreted relative to the constraint
+    co = beret.constraints.new("CHILD_OF")
+    co.target = pd["head"]
+    co.inverse_matrix.identity()
+    co.influence = 1.0
+    co.keyframe_insert("influence", frame=1)
+    co.keyframe_insert("influence", frame=fb)
+    evaluate(fb)
+    w0 = beret.matrix_world.copy()
+    co.influence = 0.0
+    co.keyframe_insert("influence", frame=fb + 1)
+    for fc in TL_fcurves(beret):
+        for kp in fc.keyframe_points:
+            kp.interpolation = "CONSTANT"
+    p0 = w0.translation.copy()
+    key(beret, fb, loc=local.translation, rot=tuple(math.degrees(a) for a in local.to_euler()))
+    key(beret, fb + 1, loc=p0, rot=tuple(math.degrees(a) for a in w0.to_euler()))
+    key(beret, fb + 8, loc=p0 + Vector((0.2, -0.3, 0.8)), rot=(180, 0, 540))
+    key(beret, fb + 16, loc=p0 + Vector((0.5, -0.6, 0.9)), rot=(300, 40, 900))
+    key(beret, fl + 6, loc=Vector((PL.x + 0.75, PL.y - 0.55, 0.035)), rot=(360, 0, 1100))
     # rifle loses its seat and topples
     rl = TL.RIFLE_LOCAL["rot_x_deg"]
     key(rifle["root"], fb + 1, rot=(rl, 0, 0))
@@ -397,8 +416,8 @@ def animate_pandey(pd, pd_place, rifle, fb, fl, fx):
     P.face(pd, F(T["nose"]), lids=-20, lidlo=50, brows=(0.035, -25), look=(0, -10))
     for i in range(6):
         t = T["end"] + 0.25 + i * 0.22
-        shake = {"shoulder_R": (-140, 0, -20 + (10 if i % 2 else -10)), "elbow_R": (-30 if i % 2 else -60, 0, 0),
-                 "head": (-14, 0, -60), "chest": (0, 0, -30)}
+        shake = {"shoulder_R": (-5, 145 + (8 if i % 2 else -8), 0), "elbow_R": (-5 if i % 2 else -25, 0, 0),
+                 "head": (-14, 0, -55), "chest": (0, 0, -25)}
         P.pose(pd, F(t), shake, base="sit_pat")
     P.face(pd, F(T["end"]), lids=0, brows=(-0.01, 28))  # angry: brows down & in
     # balloon shred stuck on his nose from the landing on
