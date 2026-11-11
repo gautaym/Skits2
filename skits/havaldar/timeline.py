@@ -51,3 +51,9 @@ def vo_path(name):
 
 # Rifle placement relative to Pandey (his local space: +Y is behind him).
 RIFLE_LOCAL = {"loc": (0.06, 1.02, 0.0), "rot_x_deg": 44, "scale": 0.82}
+
+
+def rifle_ground_lift(rot_x_deg=44, scale=0.82, heel_v=0.058):
+    """Lift so the butt's heel corner sits exactly on the ground instead of sinking in."""
+    import math
+    return heel_v * math.sin(math.radians(rot_x_deg)) * scale
