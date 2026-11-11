@@ -7,8 +7,8 @@ PANDEY = {
     # leaning back on the rifle, arms folded on top of the belly, chin up
     "lean_folded": {
         "root": (-6, 0, 0), "chest": (-10, 0, 0), "neck": (-6, 0, 0), "head": (-8, 0, 0),
-        "shoulder_L": (-38, -34, 0), "elbow_L": (-78, 0, -62), "wrist_L": (0, 0, -10),
-        "shoulder_R": (-36, 34, 0), "elbow_R": (-84, 0, 64), "wrist_R": (0, 0, 10),
+        "shoulder_L": (-52, -40, 0), "elbow_L": (-62, 0, -48), "wrist_L": (-20, 0, -10),
+        "shoulder_R": (-50, 40, 0), "elbow_R": (-66, 0, 50), "wrist_R": (-20, 0, 10),
         "hip_L": (4, 0, 4), "hip_R": (4, 0, -4), "knee_L": (-4, 0, 0), "knee_R": (-4, 0, 0),
         "ankle_L": (7, 0, 0), "ankle_R": (7, 0, 0),
     },

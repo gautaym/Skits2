@@ -262,36 +262,77 @@ def build_pandey(col):
     return rig
 
 
+def _profile_solid(name, pts, thick, m, col, bevel=0.012):
+    """Extrude a side profile (list of (u, v): u along the gun, v up) into a solid.
+    Gun axis is local +Z (butt at z=0); the gun's top faces local -Y."""
+    import bmesh
+    import bpy
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    front = [bm.verts.new((thick / 2, -v, u)) for u, v in pts]
+    back = [bm.verts.new((-thick / 2, -v, u)) for u, v in pts]
+    bm.faces.new(front)
+    bm.faces.new(list(reversed(back)))
+    n = len(pts)
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((front[i], front[j], back[j], back[i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new(name, me)
+    col.objects.link(o)
+    bv = o.modifiers.new("bevel", "BEVEL")
+    bv.width = bevel
+    bv.segments = 3
+    bv.limit_method = "ANGLE"
+    o.data.materials.append(m)
+    for poly in o.data.polygons:
+        poly.use_smooth = True
+    return o
+
+
 def build_rifle(col):
-    """Old bolt-action .303-style rifle; origin at the butt (rests on the ground). ~1.3 m long."""
-    wood = noise_mat("rifle_wood", (0.2, 0.07, 0.025), (0.36, 0.15, 0.05), scale=18, rough=0.3, bump=0.08,
-                     mix_c3=(0.18, 0.06, 0.02), scale2=6)
-    steel = mat("gunmetal", (0.02, 0.022, 0.025), rough=0.3, metal=0.9, coat=0.3)
+    """Classic bolt-action rifle (.303 style), ~1.25 m. Origin at the butt plate; axis +Z."""
+    wood = noise_mat("rifle_wood", (0.24, 0.08, 0.025), (0.4, 0.16, 0.05), scale=22, rough=0.35, bump=0.06,
+                     mix_c3=(0.15, 0.05, 0.015), scale2=5)
+    steel = mat("gunmetal", (0.03, 0.033, 0.038), rough=0.28, metal=0.95, coat=0.4)
+    sling_m = mat("sling", (0.12, 0.07, 0.03), rough=0.85)
     root = joint("rifle_root", None, (0, 0, 0), col)
-    parts = [
-        box("rifle_butt", loc=(0, 0, 0.17), size=(0.07, 0.17, 0.34), m=wood, col=col, bevel=0.025),
-        box("rifle_wrist", loc=(0, 0.02, 0.43), size=(0.06, 0.08, 0.24), m=wood, col=col, bevel=0.02),
-        box("rifle_fore", loc=(0, 0.0, 0.83), size=(0.065, 0.075, 0.62), m=wood, col=col, bevel=0.02),
-        box("rifle_buttplate", loc=(0, 0, 0.012), size=(0.075, 0.175, 0.025), m=steel, col=col, bevel=0.006),
-        cylinder("rifle_barrel", loc=(0, 0.0, 1.02), r=0.022, depth=0.62, m=steel, col=col),
-        cylinder("rifle_muzzle", loc=(0, 0.0, 1.33), r=0.028, depth=0.04, m=steel, col=col),
-        box("rifle_receiver", loc=(0, 0.0, 0.6), size=(0.07, 0.085, 0.16), m=steel, col=col, bevel=0.01),
-        box("rifle_mag", loc=(0, 0.06, 0.6), size=(0.05, 0.06, 0.12), m=steel, col=col, bevel=0.008),
-        cylinder("rifle_bolt", loc=(0.06, 0.0, 0.64), r=0.014, depth=0.1, m=steel, col=col, rot=(0, D(90), 0)),
-        sphere("rifle_knob", loc=(0.115, 0.0, 0.64), radius=0.025, m=steel, col=col),
-        curve_tube("rifle_trigger_guard", [(0, 0.04, 0.5), (0, 0.1, 0.53), (0, 0.06, 0.58)], bevel=0.008,
-                   m=steel, col=col),
-        curve_tube("rifle_sling", [(0, 0.09, 0.3), (0, 0.17, 0.65), (0, 0.06, 1.05)], bevel=0.012,
-                   m=mat("sling", (0.22, 0.14, 0.05), rough=0.8), col=col),
+    # side profile of the wooden stock: butt with drop, pistol-grip wrist, long forend
+    stock_pts = [
+        (0.0, -0.115), (0.0, 0.055), (0.05, 0.058), (0.3, 0.035), (0.37, 0.03), (0.42, 0.034),
+        (0.98, 0.03), (1.0, 0.012), (0.99, -0.028), (0.52, -0.032), (0.45, -0.036), (0.41, -0.05),
+        (0.36, -0.085), (0.325, -0.088), (0.3, -0.055), (0.2, -0.075), (0.08, -0.1),
     ]
-    for z in (0.62, 0.95, 1.12):
-        parts.append(cylinder(f"rifle_band{z}", loc=(0, 0, z), r=0.045, depth=0.03, m=steel, col=col))
+    parts = [_profile_solid("rifle_stock", stock_pts, 0.055, wood, col)]
+    # handguard on top of the barrel
+    parts.append(_profile_solid("rifle_handguard", [(0.56, 0.03), (0.56, 0.06), (0.94, 0.055), (0.94, 0.03)],
+                                0.04, wood, col, bevel=0.008))
+    ax = lambda u, v, x=0.0: (x, -v, u)  # gun (u along, v up) -> local
     parts += [
-        box("rifle_rear_sight", loc=(0, -0.045, 0.74), size=(0.03, 0.03, 0.06), m=steel, col=col, bevel=0.005),
-        box("rifle_front_sight", loc=(0, -0.03, 1.3), size=(0.012, 0.035, 0.04), m=steel, col=col, bevel=0.003),
-        cylinder("rifle_nosecap", loc=(0, 0, 1.15), r=0.04, r2=0.03, depth=0.07, m=steel, col=col),
-        cylinder("rifle_bayonet_lug", loc=(0, 0.03, 1.2), r=0.012, depth=0.05, m=steel, col=col),
+        cylinder("rifle_barrel", loc=ax(0.83, 0.045), r=0.015, depth=0.86, m=steel, col=col, segs=16),
+        cylinder("rifle_muzzle", loc=ax(1.255, 0.045), r=0.019, depth=0.03, m=steel, col=col, segs=16),
+        box("rifle_receiver", loc=ax(0.46, 0.05), size=(0.05, 0.045, 0.16), m=steel, col=col, bevel=0.008),
+        box("rifle_buttplate", loc=ax(0.004, -0.03), size=(0.06, 0.175, 0.012), m=steel, col=col, bevel=0.004),
+        box("rifle_mag", loc=ax(0.48, -0.055), size=(0.04, 0.05, 0.09), m=steel, col=col, bevel=0.006),
+        box("rifle_rear_sight", loc=ax(0.6, 0.075), size=(0.025, 0.03, 0.04), m=steel, col=col, bevel=0.004),
+        box("rifle_front_sight", loc=ax(1.22, 0.072), size=(0.012, 0.03, 0.025), m=steel, col=col, bevel=0.003),
+        box("rifle_trigger", loc=ax(0.4, -0.06), size=(0.008, 0.035, 0.012), m=steel, col=col, bevel=0.002,
+            rot=(__import__("math").radians(-20), 0, 0)),
+        curve_tube("rifle_trigger_guard", [ax(0.43, -0.035), ax(0.425, -0.085), ax(0.37, -0.09), ax(0.355, -0.06)],
+                   bevel=0.007, m=steel, col=col),
+        # bolt handle sticking out sideways with a ball knob: the giveaway rifle detail
+        curve_tube("rifle_bolt", [ax(0.45, 0.05, 0.02), ax(0.44, 0.04, 0.07), ax(0.43, 0.01, 0.1)], bevel=0.009,
+                   m=steel, col=col),
+        sphere("rifle_bolt_knob", loc=ax(0.43, 0.005, 0.105), radius=0.022, m=steel, col=col),
+        curve_tube("rifle_sling", [ax(0.12, -0.1), ax(0.45, -0.2), ax(0.8, -0.12), ax(0.92, -0.03)], bevel=0.012,
+                   m=sling_m, col=col),
     ]
+    parts[-1].data.bevel_depth = 0.004
+    parts[-1].data.extrude = 0.014  # flat strap
+    for u in (0.62, 0.95):
+        parts.append(cylinder(f"rifle_band{u}", loc=ax(u, 0.02), r=0.05, depth=0.025, m=steel, col=col, segs=20))
     for o in parts:
         o.parent = root
     return {"root": root}
