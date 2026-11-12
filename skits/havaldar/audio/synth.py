@@ -329,6 +329,19 @@ def dhaam_pop(d=2.2):
     return mix(d, (0, pop), (0.005, boom), (0.005, rumble), (0.01, debris))
 
 
+def balloon_pop(d=0.6):
+    """Sharp rubber balloon burst: bright crack + rubber twang + tiny room tail, clearly not an explosion."""
+    n = int(d * SR)
+    crack = hp(noise(0.03), 1200, 4) * decay(0.03, 0.004) * 3.0
+    click = np.zeros(n)
+    click[0] = 1.0
+    click = bp(click, 2000, 9000) * 40
+    twang = np.sin(osc_phase(np.full(int(0.08 * SR), 950.0))) * decay(0.08, 0.018) * 0.5
+    snap_low = np.sin(osc_phase(180 + 300 * np.exp(-t_(0.08) / 0.01))) * decay(0.08, 0.02) * 0.6
+    tail = bp(noise(d), 800, 6000) * decay(d, 0.07) * 0.25
+    return mix(d, (0, click), (0, crack), (0.001, twang), (0, snap_low), (0.004, tail))
+
+
 def boing(d=1.0):
     tt = t_(d)
     f = 140 * (1 + 0.6 * np.exp(-tt / 0.25) * np.sin(2 * np.pi * 9 * tt)) * (1 + 0.8 * tt / d)
@@ -401,6 +414,7 @@ def main():
     save("sfx/crickets.wav", crickets())
     save("sfx/drumroll.wav", drumroll())
     save("sfx/dhaam_pop.wav", dhaam_pop())
+    save("sfx/balloon_pop.wav", balloon_pop(), gain_db=0.0)
     save("sfx/boing.wav", boing())
     save("sfx/dhapp_land.wav", dhapp_land())
     save("sfx/frantic_pat.wav", frantic_pat())

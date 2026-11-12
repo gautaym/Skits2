@@ -64,26 +64,27 @@ T, VO = _build()
 
 # Sound effects and music: (path under audio/, start seconds, gain, max seconds or None)
 SFX = [
-    ("music/village_ambience.wav", 0.0, 0.22, T["out"]),
-    ("music/hero_theme.wav", 0.0, 0.55, T["peek"] - 0.05),
-    ("sfx/thunder_crash.wav", 0.0, 0.8, None),
+    ("music/village_ambience.wav", 0.0, 0.12, T["out"]),
+    ("music/hero_theme.wav", 0.0, 0.13, T["peek"] - 0.05),
+    ("sfx/thunder_crash.wav", 0.0, 0.18, None),
     ("sfx/belly_pat_dhab.wav", T["pat"], 1.0, None),
     ("sfx/record_scratch.wav", T["peek"] - 0.12, 0.9, None),
-    ("music/sneaky_strings.wav", T["sneak"], 0.5, T["kaun"] - 0.15 - T["sneak"]),
+    ("music/sneaky_strings.wav", T["sneak"], 0.26, T["kaun"] - 0.15 - T["sneak"]),
     ("sfx/balloon_squeak.wav", T["kaun"] - 0.15, 0.9, None),
     ("sfx/crickets.wav", T["freeze"], 0.8, T["hawa"] - T["freeze"]),
-    ("music/sneaky_strings_fast.wav", T["hawa"] + 1.3, 0.4, T["setup"] - T["hawa"] - 1.3),
-    ("sfx/drumroll.wav", T["setup"], 0.6, T["bang"] - T["setup"]),
-    ("sfx/dhaam_pop.wav", T["bang"], 1.0, None),
+    ("music/sneaky_strings_fast.wav", T["hawa"] + 1.3, 0.18, T["setup"] - T["hawa"] - 1.3),
+    ("sfx/drumroll.wav", T["setup"], 0.4, T["bang"] - T["setup"]),
+    ("sfx/balloon_pop.wav", T["bang"], 1.0, None),
+    ("sfx/dhaam_pop.wav", T["bang"] + 0.07, 0.55, None),
     ("sfx/boing.wav", T["bang"] + 0.15, 0.8, None),
     ("sfx/dhapp_land.wav", T["bang"] + 1.1, 1.0, None),
     ("sfx/frantic_pat.wav", T["ground"] + 0.1, 0.55, None),
     ("sfx/frantic_pat.wav", T["frantic"] + 0.3, 0.45, None),
     ("sfx/whoosh_away.wav", T["run"] + 0.6, 0.8, None),
-    ("music/shehnai_lazy.wav", T["baba"], 0.5, None),
+    ("music/shehnai_lazy.wav", T["baba"], 0.25, None),
     ("sfx/paan_chew.wav", T["baba"], 0.55, None),
-    ("sfx/sad_trombone.wav", T["end"] - 0.05, 0.75, None),
-    ("music/hero_kazoo.wav", T["kazoo"], 0.6, None),
+    ("sfx/sad_trombone.wav", T["end"] - 0.05, 0.35, None),
+    ("music/hero_kazoo.wav", T["kazoo"], 0.3, None),
 ]
 
 
