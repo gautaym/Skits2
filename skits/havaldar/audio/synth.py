@@ -320,13 +320,28 @@ def drumroll(d=3.0):
     return mix(d, *parts)
 
 
-def dhaam_pop(d=2.2):
-    pop = hp(noise(0.03), 2000) * decay(0.03, 0.006) * 2.0
-    f = 32 + 90 * np.exp(-t_(d) / 0.08)
-    boom = np.tanh(2.5 * np.sin(osc_phase(f)) * decay(d, 0.5))
-    rumble = lp(noise(d), 300, 4) * decay(d, 0.6) * 2.5
-    debris = bp(noise(d), 1000, 5000) * decay(d, 0.25) * 0.4
-    return mix(d, (0, pop), (0.005, boom), (0.005, rumble), (0.01, debris))
+def dhaam_pop(d=3.2):
+    """Big cartoon blast: clipped crack, sub drop, rumbling body, debris crackle, long reverb tail."""
+    from scipy.signal import fftconvolve
+    n = int(d * SR)
+    tt = t_(d)
+    crack = lp(noise(0.06), 9000) * decay(0.06, 0.012) * 4.0
+    sub_f = 26 + 70 * np.exp(-tt / 0.12)
+    sub = np.sin(osc_phase(sub_f)) * decay(d, 0.55) * 2.2
+    brown = np.cumsum(noise(d))
+    brown = hp(brown / (np.max(np.abs(brown)) or 1), 25)
+    body = lp(brown, 700, 4) * decay(d, 0.7) * (1 + 0.5 * lp(noise(d), 12)) * 6.0
+    mid = bp(noise(d), 300, 2500) * decay(d, 0.25) * 1.5
+    crackle = np.zeros(n)
+    idx = rng.integers(int(0.03 * SR), int(1.4 * SR), 260)
+    crackle[idx] = rng.uniform(-1, 1, len(idx)) * np.exp(-idx / SR / 0.5)
+    crackle = bp(crackle, 1500, 7000) * 12
+    dry = mix(d, (0, crack), (0.002, sub), (0.004, body), (0.004, mid), (0, crackle))
+    ir = noise(2.2) * np.exp(-t_(2.2) / 0.55)
+    wet = fftconvolve(lp(dry, 4000), ir)[:n]
+    wet = wet / (np.max(np.abs(wet)) or 1) * np.max(np.abs(dry)) * 0.5
+    x = dry + wet
+    return np.tanh(1.8 * x / (np.max(np.abs(x)) or 1)) * env(n, 0.001, 0.6)
 
 
 def balloon_pop(d=0.6):

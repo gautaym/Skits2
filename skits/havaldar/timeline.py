@@ -73,9 +73,9 @@ SFX = [
     ("sfx/balloon_squeak.wav", T["kaun"] - 0.15, 0.9, None),
     ("sfx/crickets.wav", T["freeze"], 0.8, T["hawa"] - T["freeze"]),
     ("music/sneaky_strings_fast.wav", T["hawa"] + 1.3, 0.18, T["setup"] - T["hawa"] - 1.3),
-    ("sfx/drumroll.wav", T["setup"], 0.4, T["bang"] - T["setup"]),
-    ("sfx/balloon_pop.wav", T["bang"], 1.0, None),
-    ("sfx/dhaam_pop.wav", T["bang"] + 0.07, 0.55, None),
+    ("sfx/drumroll.wav", T["setup"], 0.4, T["bang"] - T["setup"] - 0.18),  # beat of silence before the blast
+    ("sfx/balloon_pop.wav", T["bang"], 0.8, None),
+    ("sfx/dhaam_pop.wav", T["bang"] + 0.02, 1.6, None),
     ("sfx/boing.wav", T["bang"] + 0.15, 0.8, None),
     ("sfx/dhapp_land.wav", T["bang"] + 1.1, 1.0, None),
     ("sfx/frantic_pat.wav", T["ground"] + 0.1, 0.55, None),
