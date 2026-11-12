@@ -415,7 +415,13 @@ def sad_trombone(d=3.0):
     return mix(d, *parts)
 
 
+def teaser_sting():
+    """Two cheeky pizzicato plucks 'tin-tin!' for Chhotu's first sneak peek."""
+    return mix(0.8, (0.0, pluck(72, 0.4)), (0.16, pluck(79, 0.6)))
+
+
 def main():
+    save("sfx/teaser_sting.wav", teaser_sting())
     save("music/hero_theme.wav", hero_theme())
     save("music/hero_kazoo.wav", hero_kazoo())
     save("music/sneaky_strings.wav", sneaky())

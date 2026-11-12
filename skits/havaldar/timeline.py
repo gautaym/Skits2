@@ -27,6 +27,8 @@ def _build():
         return at + DUR[name]
 
     T["hook"] = 0.0
+    T["tease"] = 1.15        # Chhotu pops his head out (hook: within 2 s)
+    T["tease_end"] = 2.25    # ...ducks back, cut back to Pandey
     h1_end = line("h1_naam_pandey.mp3", 0.2)
     T["hook_low"] = round(0.2 + DUR["h1_naam_pandey.mp3"] * 0.5, 2)   # cut mid-line to the hero low angle
     T["pat"] = h1_end + 0.05                                           # belly pat DHAB
@@ -67,6 +69,7 @@ SFX = [
     ("music/village_ambience.wav", 0.0, 0.12, T["out"]),
     ("music/hero_theme.wav", 0.0, 0.13, T["peek"] - 0.05),
     ("sfx/thunder_crash.wav", 0.0, 0.18, None),
+    ("sfx/teaser_sting.wav", T["tease"] + 0.05, 0.7, None),
     ("sfx/belly_pat_dhab.wav", T["pat"], 1.0, None),
     ("sfx/record_scratch.wav", T["peek"] - 0.12, 0.9, None),
     ("music/sneaky_strings.wav", T["sneak"], 0.26, T["kaun"] - 0.15 - T["sneak"]),

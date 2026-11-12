@@ -455,19 +455,27 @@ def animate_chhotu(ch, ch_place, fb):
     co.use_scale_x = co.use_scale_y = co.use_scale_z = False
     co.inverse_matrix.identity()
     key(bal, 1, loc=(0, 0, 0.04), rot=(0, 0, 0))
-    # hidden behind the wall
-    key(ch_place, 1, loc=(-2.75, 2.6, 0), rot=(0, 0, 0))
+    # hidden behind the wall end (same spot he peeks from)
+    HIDE = (-2.92, 2.62, 0)
+    key(ch_place, 1, loc=HIDE, rot=(0, 0, 20))
     P.pose(ch, 1, "rest")
     P.face(ch, 1, lids=-42, lidlo=48, brows=(0, 0), mouth=0)
-    # ---- peek round the wall end: lean out to his right (-X)
-    key(ch_place, F(T["peek"]) - 1, loc=(-2.75, 2.6, 0))
-    key(ch_place, F(T["peek"]), loc=(-2.92, 2.62, 0), rot=(0, 0, 20))
     peek = {"root": (0, -18, 0), "chest": (0, -14, 0), "head": (0, 26, -20),
             "shoulder_R": (-150, 0, -15), "elbow_R": (-30, 0, 0),
             "shoulder_L": (-60, 0, -30), "elbow_L": (-125, 0, -20)}
+    # ---- TEASER (hook, < 2 s): pops out, sly grin and eyebrow to camera, ducks back
+    P.pose(ch, F(T["tease"]) - 2, "rest")
+    P.pose(ch, F(T["tease"] + 0.15), peek)
+    P.face(ch, F(T["tease"] + 0.15), lids=-25, brows={"L": (0.035, 18), "R": (-0.005, -10)}, look=(0, -30), mouth=0.3)
+    P.face(ch, F(T["tease"] + 0.6), lids=5, brows={"L": (0.04, 22), "R": (-0.01, -14)}, look=(0, -30), mouth=0.45)
+    P.pose(ch, F(T["tease_end"] - 0.25), peek)
+    P.pose(ch, F(T["tease_end"] - 0.05), "rest")
+    P.face(ch, F(T["tease_end"]), lids=-42, brows=(0, 0), mouth=0, look=(0, 0))
+    # ---- peek round the wall end: lean out to his right (-X)
+    P.pose(ch, F(T["peek"]) - 3, "rest")
     P.pose(ch, F(T["peek"]), peek)
     P.pose(ch, F(T["sneak"]) - 1, peek)
-    key(ch_place, F(T["sneak"]) - 1, loc=(-2.92, 2.62, 0), rot=(0, 0, 20))
+    key(ch_place, F(T["sneak"]) - 1, loc=HIDE, rot=(0, 0, 20))
     P.face(ch, F(T["peek"]), lids=-30, brows={"L": (0.03, 15), "R": (-0.005, -10)}, look=(0, -25))
     P.face(ch, F(T["peek"] + 0.4), look=(0, -35))
     # ---- sneak: giant tiptoe steps round the corner toward Pandey's back
@@ -582,7 +590,11 @@ def build_cameras(pd, ch, bb, col, fb):
     camera("cam_hook", (2.5, -4.6, 0.95), (0.5, 1.0, 1.25), 30, T["hook"], end_loc=(1.55, -3.0, 1.1),
            t_end=T["hook_low"], col=col)
     camera("cam_hero_low", (2.5, -0.9, 0.75), (0.55, 1.0, 1.85), 24, T["hook_low"], col=col)
-    camera("cam_peek", (-3.3, -1.7, 1.05), (-3.35, 2.4, 0.95), 48, T["peek"], col=col)
+    peek_cam = camera("cam_peek", (-3.3, -1.7, 1.05), (-3.35, 2.4, 0.95), 48, T["peek"], col=col)
+    # hook teaser: cut to Chhotu peeking within the first 2 seconds, then back to the hero intro
+    for name, t, cam in (("cam_tease", T["tease"], peek_cam), ("cam_hook_back", T["tease_end"], CAMS[0])):
+        mk = bpy.context.scene.timeline_markers.new(name, frame=f(t))
+        mk.camera = cam
     sneak = camera("cam_sneak", (-1.4, -6.0, 1.5), (-1.4, 1.2, 0.9), 20, T["sneak"], col=col)
     camera("cam_kaun", (1.7, -0.1, 2.0), h, 38, T["kaun"], col=col)
     m = bpy.context.scene.timeline_markers.new("cam_freeze", frame=f(T["freeze"]))
