@@ -310,9 +310,9 @@ def build():
 def animate_pandey(pd, pd_place, rifle, fb, fl, fx):
     F = f
     # ---- smug lean, proud, half-lidded, breathing
-    for t in (0, 2.0, 4.2, 5.0, 10.8, 13.4, 15.6):
+    for t in (0, T["pat"] - 0.3, T["peek"], T["kaun"], T["hawa"], T["setup"]):
         P.pose(pd, F(t), "lean_folded")
-    P.pose(pd, F(1.6), {"head": (-14, 0, 0)}, base="lean_folded")  # chin up during the hero intro
+    P.pose(pd, F(T["hook_low"] - 1.0), {"head": (-14, 0, 0)}, base="lean_folded")  # chin up during the hero intro
     P.face(pd, 1, lids=24, lidlo=48, brows=(0.012, 8), look=(8, 0))
     P.face(pd, F(10.75), lids=24, brows=(0.012, 8))
     for i, t in enumerate([x * 1.4 for x in range(int(T["bang"] / 1.4))]):
@@ -326,12 +326,13 @@ def animate_pandey(pd, pd_place, rifle, fb, fl, fx):
     key(pd["must_L"], F(T["hook_low"]), rot=(0, 0, 0))
     key(pd["must_R"], F(T["hook_low"]), rot=(0, 0, 0))
     # belly pat "DHAB"
-    P.pose(pd, F(4.25), "pat_up", base="lean_folded")
-    P.pose(pd, F(4.45), "pat_down", base="lean_folded")
-    P.pose(pd, F(4.65), "pat_up", base="lean_folded")
-    P.pose(pd, F(5.0), "lean_folded")
-    key(pd["belly"], F(4.45), scale=(1.06, 1.08, 0.95))
-    key(pd["belly"], F(4.6), scale=(1.0, 1.0, 1.0))
+    tp = T["pat"]
+    P.pose(pd, F(tp - 0.2), "pat_up", base="lean_folded")
+    P.pose(pd, F(tp), "pat_down", base="lean_folded")
+    P.pose(pd, F(tp + 0.2), "pat_up", base="lean_folded")
+    P.pose(pd, F(tp + 0.45), "lean_folded")
+    key(pd["belly"], F(tp), scale=(1.06, 1.08, 0.95))
+    key(pd["belly"], F(tp + 0.15), scale=(1.0, 1.0, 1.0))
     # ---- "कौन है बे?" : head tilts, ear twitches, eyes stay half shut
     P.pose(pd, F(T["kaun"] + 0.15), "suspicious", base="lean_folded")
     for i in range(3):
@@ -529,14 +530,14 @@ def animate_chhotu(ch, ch_place, fb):
     P.face(ch, fb + 1, lids=-70, brows=(0.04, 0), mouth=1.0)
     key(ch_place, fb + 12, loc=final + Vector((-0.5, -0.3, 0)), rot=(0, 0, 60))
     t, i = T["bang"] + 0.8, 0
-    while t < T["frantic"] + 0.9:
+    while t < T["run"]:
         P.pose(ch, F(t), {"chest": (18 if i % 2 else 8, 0, 0), "head": (-10 if i % 2 else 5, 0, 0),
                           "shoulder_L": (-40, 0, -50), "elbow_L": (-90, 0, -40),
                           "shoulder_R": (-40, 0, 50), "elbow_R": (-90, 0, 40)})
         P.face(ch, F(t), lids=60, lidlo=60, mouth=0.9 if i % 2 else 0.5, brows=(0.02, 15))
         t += 0.15
         i += 1
-    run0, run1 = T["frantic"] + 0.9, T["frantic"] + 2.6
+    run0, run1 = T["run"], T["run"] + 1.6
     key(ch_place, F(run0), loc=final + Vector((-0.5, -0.3, 0)), rot=(0, 0, -90))
     key(ch_place, F(run1), loc=(-5.5, 0.3, 0), rot=(0, 0, -90))
     t, i = run0, 0
@@ -569,7 +570,7 @@ def animate_baba(bb, bb_place):
             key(ck, fr + 5, scale=(1.18, 1.0, 0.95))
     # chuckle: "हें हें हें"
     for i in range(4):
-        t = T["nose"] + 2.2 + i * 0.18
+        t = T["end"] - 0.9 + i * 0.18
         P.pose(bb, F(t), {"head": (8 if i % 2 else 18, 0, 6), "chest": (8 if i % 2 else 14, 0, 0)}, base="lean_stick")
     for fname, who, start, dur in TL.VO:
         if who == "baba":
@@ -595,6 +596,13 @@ def build_cameras(pd, ch, bb, col, fb):
     camera("cam_baba", (0.25, -0.55, 0.28), bb["head"], 22, T["baba"], col=col)
     camera("cam_nose", (1.95, 1.7, 1.25), h, 32, T["nose"], col=col)
     camera("cam_end", (0.5, -2.3, 1.0), h, 28, T["end"], col=col)
+    # extra cuts for a fast-paced reel (nothing held longer than ~3 s except the freeze)
+    camera("cam_pat", (1.7, -1.3, 1.35), pd["belly"], 30, T["pat"] - 0.8, col=col)
+    camera("cam_ground_face", (2.5, 0.75, 1.1), h, 26, T["ground"] + 2.0, col=col)
+    run_m = bpy.context.scene.timeline_markers.new("cam_run", frame=f(T["run"]))
+    run_m.camera = bpy.data.objects["cam_ground"]
+    camera("cam_baba_cu", (0.95, 0.95, 1.45), bb["head"], 26, T["baba"] + 2.4, col=col)
+    camera("cam_two_shot", (0.5, -2.6, 1.1), (1.2, 0.7, 1.0), 28, T["nose"] + 2.8, col=col)
     bpy.context.scene.camera = CAMS[0]
 
 

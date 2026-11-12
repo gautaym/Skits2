@@ -1,6 +1,6 @@
 {
-  "label": "preview-01",
-  "res": 540,
-  "samples": 16,
+  "label": "reel-v1",
+  "res": 720,
+  "samples": 24,
   "chunks": 20
 }

@@ -19,16 +19,10 @@ def clips():
         p = TL.vo_path(fname)
         if os.path.exists(p):
             out.append((p, start, 1.0, None))
-    for sub in ("sfx", "music"):
-        cue = os.path.join(TL.AUDIO, sub, "cues.txt")  # lines: file start_seconds [gain] [max_seconds]
-        if os.path.exists(cue):
-            for line in open(cue):
-                parts = line.split()
-                if len(parts) >= 2 and not line.startswith("#"):
-                    p = os.path.join(TL.AUDIO, sub, parts[0])
-                    if os.path.exists(p):
-                        out.append((p, float(parts[1]), float(parts[2]) if len(parts) > 2 else 1.0,
-                                    float(parts[3]) if len(parts) > 3 else None))
+    for rel, start, gain, maxlen in TL.SFX:
+        p = os.path.join(TL.AUDIO, rel)
+        if os.path.exists(p):
+            out.append((p, start, gain, maxlen))
     return out
 
 
@@ -47,7 +41,7 @@ def main(out):
         filt.append(f"[{i}:a]{trim}aresample=48000,aformat=channel_layouts=stereo,volume={gain},"
                     f"adelay={ms}|{ms}[a{i}]")
     mix_in = "[0:a]" + "".join(f"[a{i}]" for i in range(1, len(cs) + 1))
-    filt.append(f"{mix_in}amix=inputs={len(cs) + 1}:normalize=0:duration=first,alimiter=limit=0.95[out]")
+    filt.append(f"{mix_in}amix=inputs={len(cs) + 1}:normalize=0:duration=first,alimiter=limit=0.95,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=48000[out]")
     args += ["-filter_complex", ";".join(filt), "-map", "[out]", "-t", str(dur), out]
     subprocess.run(args, check=True)
     print(f"mixed {len(cs)} clips -> {out}")

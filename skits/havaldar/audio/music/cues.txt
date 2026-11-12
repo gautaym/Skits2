@@ -1,7 +1,0 @@
-# file start_seconds gain [max_seconds]   (missing files are skipped by mix_audio.py)
-village_ambience.mp3 0.0 0.25 37.6
-hero_theme.mp3 0.0 0.6 5.15
-sneaky_strings.mp3 8.2 0.45 2.45
-sneaky_strings_fast.mp3 14.6 0.45 1.0
-shehnai_lazy.mp3 28.9 0.5
-hero_kazoo.mp3 35.6 0.6
