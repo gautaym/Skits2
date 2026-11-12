@@ -1,0 +1,14 @@
+# file start_seconds gain [max_seconds]   (missing files are skipped by mix_audio.py)
+thunder_crash.mp3 0.0 0.9
+belly_pat_dhab.mp3 4.45 1.0
+record_scratch.mp3 5.15 0.9
+balloon_squeak.mp3 10.65 0.9
+crickets.mp3 11.9 0.7 1.5
+drumroll.mp3 15.6 0.7
+dhaam_pop.mp3 18.4 1.0
+boing.mp3 18.55 0.8
+dhapp_land.mp3 19.5 1.0
+frantic_pat.mp3 19.9 0.6
+whoosh_away.mp3 25.0 0.7
+paan_chew.mp3 28.9 0.6
+sad_trombone.mp3 34.5 0.8

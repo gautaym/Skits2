@@ -28,7 +28,7 @@ PANDEY = {
         "root": (0, 0, 0), "chest": (12, 0, 0), "head": (8, 0, 0),
         "hip_L": (-82, 0, 18), "hip_R": (-82, 0, -18), "knee_L": (8, 0, 0), "knee_R": (8, 0, 0),
         "ankle_L": (-20, 0, 0), "ankle_R": (-20, 0, 0),
-        "shoulder_L": (25, 0, 30), "elbow_L": (-20, 0, 0), "shoulder_R": (25, 0, -30), "elbow_R": (-20, 0, 0),
+        "shoulder_L": (28, -38, 0), "elbow_L": (-20, 0, 0), "shoulder_R": (28, 38, 0), "elbow_R": (-20, 0, 0),
     },
     "fist_shake": {"shoulder_R": (-120, 0, -20), "elbow_R": (-40, 0, 0), "wrist_R": (0, 0, 0),
                    "head": (-8, 0, 0)},

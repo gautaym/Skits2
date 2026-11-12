@@ -402,7 +402,8 @@ def animate_pandey(pd, pd_place, rifle, fb, fl, fx):
     t = T["bang"] + 1.2
     i = 0
     while t < T["baba"] - 0.2:
-        alt = {"shoulder_L": (40 if i % 2 else 15, 0, 30), "shoulder_R": (15 if i % 2 else 40, 0, -30),
+        alt = {"shoulder_L": (38 if i % 2 else 18, -38, 0), "elbow_L": (-35 if i % 2 else -10, 0, 0),
+               "shoulder_R": (18 if i % 2 else 38, 38, 0), "elbow_R": (-10 if i % 2 else -35, 0, 0),
                "head": (10, 0, 25 if (i // 4) % 2 else -25)}
         P.pose(pd, F(t), alt, base="sit_pat")
         t += 0.2
@@ -444,6 +445,15 @@ def animate_pandey(pd, pd_place, rifle, fb, fl, fx):
 
 def animate_chhotu(ch, ch_place, fb):
     F = f
+    # balloon follows the hand's position only (never its rotation), floating upright above the fist
+    bal, wr = ch["balloon"], ch["wrist_R"]
+    bal.parent = None
+    co = bal.constraints.new("CHILD_OF")
+    co.target = wr
+    co.use_rotation_x = co.use_rotation_y = co.use_rotation_z = False
+    co.use_scale_x = co.use_scale_y = co.use_scale_z = False
+    co.inverse_matrix.identity()
+    key(bal, 1, loc=(0, 0, 0.04), rot=(0, 0, 0))
     # hidden behind the wall
     key(ch_place, 1, loc=(-2.75, 2.6, 0), rot=(0, 0, 0))
     P.pose(ch, 1, "rest")
@@ -491,10 +501,10 @@ def animate_chhotu(ch, ch_place, fb):
     # ---- aim the balloon right behind the backside: solve placement so the balloon lands there
     P.pose(ch, F(T["setup"]), "aim")
     key(ch["root"], F(T["setup"]), loc=(0, 0, 0))
-    # pull the balloon down off its string into his hands, held out in front
-    bal = ch["balloon"]
-    key(bal, F(T["hawa"] + 1.3), loc=bal.location.copy())
-    key(bal, F(T["setup"]), loc=(0, 0.06, -0.68))
+    # bring the balloon down into his hands, held out in front of him (world-axis offset from the wrist)
+    fwd = Vector((math.sin(D(55)), -math.cos(D(55)), 0))
+    key(bal, F(T["hawa"] + 1.3), loc=(0, 0, 0.04))
+    key(bal, F(T["setup"]), loc=fwd * 0.17 + Vector((0, 0.05, -0.43)))
     key(ch_place, F(T["setup"]), loc=(-0.65, 0.78, 0), rot=(0, 0, 55))
     evaluate(F(T["setup"]))
     off = BALLOON_AT - world_center([o for o in ch["balloon_mesh"][:1]])
